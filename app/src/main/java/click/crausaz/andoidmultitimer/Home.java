@@ -1,4 +1,4 @@
-package ncrausaz.andoidmultitimers;
+package click.crausaz.andoidmultitimer;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -22,7 +22,7 @@ public class Home extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                Snackbar.make(view, "Button clicked", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
         });

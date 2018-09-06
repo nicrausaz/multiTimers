@@ -1,4 +1,4 @@
-package ncrausaz.andoidmultitimers;
+package click.crausaz.andoidmultitimer;
 
 import org.junit.Test;
 

@@ -1,4 +1,4 @@
-package ncrausaz.andoidmultitimers;
+package click.crausaz.andoidmultitimer;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("ncrausaz.andoidmultitimers", appContext.getPackageName());
+        assertEquals("click.crausaz.andoidmultitimer", appContext.getPackageName());
     }
 }
