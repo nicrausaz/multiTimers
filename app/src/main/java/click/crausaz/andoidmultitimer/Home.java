@@ -6,17 +6,23 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.simple.parser.JSONParser;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.nio.file.Files;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Collections;
 
 public class Home extends AppCompatActivity {
 
@@ -26,7 +32,8 @@ public class Home extends AppCompatActivity {
             "The last samurai"
     };
     private Context app_context;
-    private String timers_data_name = "timers_data.json";
+    private final String timers_data_name = "timers_data.json";
+    private String timers_json_string = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,9 +55,8 @@ public class Home extends AppCompatActivity {
 
         ListView list = findViewById(R.id.list_timers);
         getTimers();
-        writeNewTimer();
 
-        list.setAdapter(new ArrayAdapter<String>(this, R.layout.timer, movies));
+        list.setAdapter(new ArrayAdapter<>(this, R.layout.timer, Collections.singletonList(timers_json_string)));
     }
 
     @Override
@@ -80,33 +86,41 @@ public class Home extends AppCompatActivity {
     }
 
     private void writeNewTimer() {
-        JSONObject obj = new JSONObject();
-        String content = Files.rea(timers_data_name);
+        // append new object
+    }
 
+    private void getFileContent() {
         try {
-            obj.put("Name", "Timer1");
-            obj.put("Time", "00:00:05");
+            Object obj = new JSONParser().parse(new FileReader(app_context.getFilesDir() + "/" + timers_data_name));
+            Log.w("data", obj.toString());
+            Log.w("data", "test");
+        } catch (IOException e) {
+            try {
+                // create a new file and put json base structure
+                new File(app_context.getFilesDir(), timers_data_name).createNewFile();
+                JSONObject initer = new JSONObject();
+                JSONArray timers_array = new JSONArray();
+                initer.put("timers", timers_array);
+                FileWriter fileWriter = new FileWriter(app_context.getFilesDir() + "/" + timers_data_name);
+                fileWriter.write(initer.toString());
+                fileWriter.close();
 
-            FileOutputStream outputStream;
-            outputStream = openFileOutput(timers_data_name, app_context.MODE_PRIVATE);
-            outputStream.write(obj.toString().getBytes());
-            outputStream.close();
-
-        } catch (Exception e) {
-
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            } catch (JSONException e1) {
+                e1.printStackTrace();
+            }
+        } catch (org.json.simple.parser.ParseException e) {
+            e.printStackTrace();
         }
-
     }
 
     private void getTimers() {
-        try {
-            // try to open the data file
-            FileOutputStream outputStream;
-            outputStream = openFileOutput(timers_data_name, app_context.MODE_PRIVATE);
-            outputStream.close();
-        } catch (Exception e) {
-            // error, create a new file
-            new File(app_context.getFilesDir(), timers_data_name);
-        }
+        // try to open the data file
+        // FileOutputStream outputStream;
+        // outputStream = openFileOutput(timers_data_name, app_context.MODE_PRIVATE);
+        // outputStream.close();
+        // get values
+        getFileContent();
     }
 }
