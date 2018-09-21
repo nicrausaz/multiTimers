@@ -6,15 +6,29 @@
             android:key="switch_vibration"
             android:summary="Vibrate on alarm"
             android:title="Vibrate" />
-        <!--<RingtonePreference
-            android:key="ringtone_preference_1"
-            android:summary="Choose ringtone"
-            android:title="Ringtone preference" />-->
-    </PreferenceCategory>
+       <SwitchPreference
+           android:defaultValue="true"
+           android:key="switch_led"
+           android:summary="Blink LED"
+           android:title="Blink LED on alarm" />
+   </PreferenceCategory>
     <PreferenceCategory android:title="Timers">
-
+        <Preference android:title="Delete all"
+            android:key="delete_all_timers"
+            android:summary="Delete all timers"/>
+        <!--<RingtonePreference
+            android:defaultValue="content://settings/system/notification_sound"
+            android:key="ringtone_preference_1"
+            android:ringtoneType="ringtone"
+            android:summary="Choose alarm ringtone"
+            android:title="Ringtone" />-->
     </PreferenceCategory>
-    <PreferenceCategory android:title="Data">
-
+   <PreferenceCategory android:title="Data">
+       <Preference android:title="Import"
+           android:key="import_timers"
+           android:summary="Import timers file"/>
+       <Preference android:title="Export"
+           android:key="export_timers"
+           android:summary="Export timers file"/>
     </PreferenceCategory>
 </PreferenceScreen>

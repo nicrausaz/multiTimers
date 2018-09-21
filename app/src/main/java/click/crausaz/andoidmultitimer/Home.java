@@ -1,19 +1,28 @@
 package click.crausaz.andoidmultitimer;
 
+import android.app.DialogFragment;
+import android.app.FragmentManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Adapter;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -39,7 +48,7 @@ public class Home extends AppCompatActivity {
         // init components
         setContentView(R.layout.activity_home);
         Toolbar toolbar = findViewById(R.id.toolbar);
-        ListView list = findViewById(R.id.list_timers);
+        // ListView list = findViewById(R.id.list_timers);
         setSupportActionBar(toolbar);
         initAddButton();
 
@@ -54,6 +63,7 @@ public class Home extends AppCompatActivity {
         Log.i("timers:", json_timers.toString());
 
         // convert JSON to ArrayAdapter
+        /*
         ArrayList<String> list_timers = new ArrayList<>();
         JSONArray timers_array = null;
         try {
@@ -65,9 +75,14 @@ public class Home extends AppCompatActivity {
             }
         } catch (JSONException e) {
             e.printStackTrace();
-        }
+        }*/
 
-        list.setAdapter(new ArrayAdapter<>(this, R.layout.timer, list_timers));
+        String countryList[] = {"India", "China", "australia", "Portugle", "America", "NewZealand"};
+        String descriptionsList[] = {"test", "test2", "test3", "test4", "test5", "test6"};
+        ListView listView = findViewById(R.id.timers_list);
+
+        // listView.setAdapter(customAdapter);
+        // list.setAdapter(new ArrayAdapter<>(this, R.layout.timer, list_timers));
     }
 
     @Override
@@ -101,9 +116,31 @@ public class Home extends AppCompatActivity {
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
+            public void onClick(View view) { initAddTimerDialog(); }
+        });
+    }
+
+    private void initAddTimerDialog () {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View mView = getLayoutInflater().inflate(R.layout.add_timer_dialog,null);
+        final EditText new_name = mView.findViewById(R.id.new_timer_name);
+        final EditText new_time = mView.findViewById(R.id.new_timer_time);
+        Button mLogin = mView.findViewById(R.id.add_button);
+
+        builder.setView(mView);
+        final AlertDialog dialog = builder.create();
+        dialog.show();
+        mLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Button clicked", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                if(!new_name.getText().toString().isEmpty() && !new_time.getText().toString().isEmpty()){
+                    dialog.dismiss();
+                    Snackbar.make(view, "Timer added", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                } else {
+                    Snackbar.make(view, "Error", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                }
             }
         });
     }
