@@ -4,44 +4,39 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
+import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-public class CustomAdapter extends BaseAdapter {
-    Context context;
-    String countryList[];
-    String descriptions[];
-    LayoutInflater inflater;
+import java.util.ArrayList;
+import java.util.List;
 
-    public CustomAdapter(Context applicationContext, String[] countryList, String[] descriptions) {
-        this.context = applicationContext;
-        this.countryList = countryList;
-        this.descriptions = descriptions;
-        inflater = (LayoutInflater.from(applicationContext));
+public class CustomAdapter extends ArrayAdapter<Timer> {
+
+    private Context mContext;
+    private List<Timer> timers_list;
+
+    public CustomAdapter( Context context, ArrayList<Timer> list) {
+        super(context, 0, list);
+        mContext = context;
+        timers_list = list;
     }
 
-    @Override
-    public int getCount() {
-        return countryList.length;
-    }
+    public View getView(int position, View convertView, ViewGroup parent) {
+        View listItem = convertView;
+        if(listItem == null)
+            listItem = LayoutInflater.from(mContext).inflate(R.layout.timer, parent,false);
 
-    @Override
-    public Object getItem(int i) {
-        return null;
-    }
+        Timer current_timer = timers_list.get(position);
 
-    @Override
-    public long getItemId(int i) {
-        return 0;
-    }
+        TextView name = listItem.findViewById(R.id.name);
+        name.setText(current_timer.timer_name);
 
-    @Override
-    public View getView(int i, View view, ViewGroup viewGroup) {
-        view = inflater.inflate(R.layout.activity_home, null);
-        TextView actual_time = (TextView) view.findViewById(R.id.actual_time);
-        TextView full_time = (TextView) view.findViewById(R.id.full_time);
-        actual_time.setText(countryList[i]);
-        full_time.setText(descriptions[i]);
-        return view;
+        TextView actual_time = listItem.findViewById(R.id.actual_time);
+        actual_time.setText(current_timer.timer_actual_time);
+
+        TextView full_time = listItem.findViewById(R.id.full_time);
+        full_time.setText(current_timer.timer_full_time);
+
+        return listItem;
     }
 }

@@ -1,24 +1,17 @@
 package click.crausaz.andoidmultitimer;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.PrimaryKey;
 
+@Entity
 public class Timer{
-    public String name;
-    public String full_time;
-    public String actual_time;
-
-    public Timer (String name, String full_time, String actual_time) {
-        this.name = name;
-        this.full_time = full_time;
-        this.actual_time = actual_time;
-    }
-
-    public JSONObject toJSONObject () throws JSONException {
-        JSONObject obj = new JSONObject();
-        obj.put("name", this.name);
-        obj.put("full_time", this.full_time);
-        obj.put("actual_time", this.actual_time);
-        return obj;
-    }
+    @PrimaryKey
+    public int timer_id;
+    @ColumnInfo(name = "timer_name")
+    public String timer_name;
+    @ColumnInfo(name = "timer_full_time")
+    public String timer_full_time;
+    @ColumnInfo(name = "timer_actual_time")
+    public String timer_actual_time;
 }
