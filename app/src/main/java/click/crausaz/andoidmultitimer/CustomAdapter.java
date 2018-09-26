@@ -23,8 +23,9 @@ public class CustomAdapter extends ArrayAdapter<Timer> {
 
     public View getView(int position, View convertView, ViewGroup parent) {
         View listItem = convertView;
-        if(listItem == null)
+        if (listItem == null) {
             listItem = LayoutInflater.from(mContext).inflate(R.layout.timer, parent,false);
+        }
 
         Timer current_timer = timers_list.get(position);
 

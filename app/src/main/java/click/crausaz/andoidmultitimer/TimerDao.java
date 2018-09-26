@@ -12,12 +12,9 @@ public interface TimerDao {
     @Query("SELECT * FROM Timer")
     List<Timer> getAll();
 
-    /*@Query("SELECT * FROM Timer WHERE timer_id IN (:userIds)")
-    List<Timer> loadAllByIds(int[] userIds);*/
-
     @Insert
     void insertAll(Timer... timers);
 
     @Delete
-    void delete(Timer user);
+    void delete(Timer ...timer);
 }

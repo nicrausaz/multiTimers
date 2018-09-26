@@ -10,9 +10,11 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -20,6 +22,10 @@ import android.widget.ListView;
 import java.util.ArrayList;
 
 public class Home extends AppCompatActivity {
+
+    public CustomAdapter timers_adapter;
+    public ArrayList<Timer> timers_list;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,9 +38,10 @@ public class Home extends AppCompatActivity {
 
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
-        ArrayList<Timer> timers_list = getTimers();
-        CustomAdapter timers_adapter = new CustomAdapter(this, timers_list);
+        timers_list = getTimers();
+        timers_adapter = new CustomAdapter(this, timers_list);
         listView.setAdapter(timers_adapter);
+        initListViewListeners(listView);
     }
 
     @Override
@@ -96,6 +103,54 @@ public class Home extends AppCompatActivity {
         });
     }
 
+    private void initListViewListeners (ListView listView) {
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // Get the selected item text from ListView
+                String selectedItem = parent.getItemAtPosition(position).toString();
+
+                // Display the selected item text on TextView
+                Log.i("selected:", selectedItem);
+            }
+        });
+
+        registerForContextMenu(listView);
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo){
+        if (v.getId() == R.id.timers_list){
+            AdapterView.AdapterContextMenuInfo info =(AdapterView.AdapterContextMenuInfo)menuInfo;
+            menu.add(0,0,0,"Reset");
+            menu.add(0,1,1,"Edit");
+            menu.add(0,2,2,"Delete");
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo menuinfo = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
+        int selectpos = menuinfo.position;
+
+        switch (item.getItemId()) {
+            case 0:
+                // reset timer
+                break;
+            case 1:
+                // edit timer
+                break;
+            case 2:
+                // delete timer
+                AppDatabase db = Room.databaseBuilder(getApplicationContext(),
+                        AppDatabase.class, "timers").allowMainThreadQueries().build();
+                Timer to_delete = timers_list.get(selectpos);
+                db.timerDao().delete(to_delete);
+                break;
+        }
+        return super.onContextItemSelected(item);
+    }
+
     public void triggerTimer (View view) {
         Log.i("click", "clickefoasdbopfbsioudfg");
     }
@@ -104,11 +159,11 @@ public class Home extends AppCompatActivity {
         AppDatabase db = Room.databaseBuilder(getApplicationContext(),
                 AppDatabase.class, "timers").allowMainThreadQueries().build(); // replace allowMainThread by async methods ?!
         Timer new_timer = new Timer();
-        new_timer.timer_id = 1;
         new_timer.timer_name = name;
         new_timer.timer_full_time = time;
         new_timer.timer_actual_time = time;
         db.timerDao().insertAll(new_timer);
+        timers_adapter.notifyDataSetChanged();
     }
 
     private ArrayList<Timer> getTimers() {

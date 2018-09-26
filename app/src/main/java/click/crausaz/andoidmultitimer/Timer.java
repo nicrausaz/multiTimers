@@ -6,7 +6,7 @@ import android.arch.persistence.room.PrimaryKey;
 
 @Entity
 public class Timer{
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     public int timer_id;
     @ColumnInfo(name = "timer_name")
     public String timer_name;

@@ -16,12 +16,6 @@
         <Preference android:title="Delete all"
             android:key="delete_all_timers"
             android:summary="Delete all timers"/>
-        <!--<RingtonePreference
-            android:defaultValue="content://settings/system/notification_sound"
-            android:key="ringtone_preference_1"
-            android:ringtoneType="ringtone"
-            android:summary="Choose alarm ringtone"
-            android:title="Ringtone" />-->
     </PreferenceCategory>
    <PreferenceCategory android:title="Data">
        <Preference android:title="Import"
