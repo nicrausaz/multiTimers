@@ -23,24 +23,22 @@ import java.util.ArrayList;
 
 public class Home extends AppCompatActivity {
 
-    public CustomAdapter timers_adapter;
-    public ArrayList<Timer> timers_list;
-
+    private CustomAdapter timers_adapter;
+    private ArrayList<Timer> timers_list;
+    private ListView listView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         Toolbar toolbar = findViewById(R.id.toolbar);
-        ListView listView = findViewById(R.id.timers_list);
+        listView = findViewById(R.id.timers_list);
         setSupportActionBar(toolbar);
         initAddButton();
 
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
-        timers_list = getTimers();
-        timers_adapter = new CustomAdapter(this, timers_list);
-        listView.setAdapter(timers_adapter);
+        loadTimersData();
         initListViewListeners(listView);
     }
 
@@ -148,6 +146,7 @@ public class Home extends AppCompatActivity {
                 db.timerDao().delete(to_delete);
                 break;
         }
+        loadTimersData();
         return super.onContextItemSelected(item);
     }
 
@@ -163,6 +162,13 @@ public class Home extends AppCompatActivity {
         new_timer.timer_full_time = time;
         new_timer.timer_actual_time = time;
         db.timerDao().insertAll(new_timer);
+        loadTimersData();
+    }
+
+    private void loadTimersData () {
+        timers_list = getTimers();
+        timers_adapter = new CustomAdapter(this, timers_list);
+        listView.setAdapter(timers_adapter);
         timers_adapter.notifyDataSetChanged();
     }
 
