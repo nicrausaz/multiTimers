@@ -1,6 +1,7 @@
 package click.crausaz.andoidmultitimer;
 
 import android.arch.persistence.room.Room;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -62,7 +63,26 @@ public class Home extends AppCompatActivity {
             return true;
         }
 
-        if (id == R.id.action_resetall) {
+        if (id == R.id.action_reset_all) {
+            return true;
+        }
+
+        if (id == R.id.action_delete_all) {
+            AlertDialog.Builder builder;
+            builder = new AlertDialog.Builder(this);
+            builder.setTitle(getString(R.string.dialog_delete_all_title))
+                    .setMessage(getString(R.string.dialog_delete_all_message))
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            DB.timerDao().deleteAll();
+                            loadTimersData();
+                        }
+                    })
+                    .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) { }
+                    })
+                    .setIcon(R.drawable.baseline_warning_black_18dp)
+                    .show();
             return true;
         }
 
@@ -213,7 +233,7 @@ public class Home extends AppCompatActivity {
         }
     }
 
-    private ArrayList<Timer> getTimers() {
+    private ArrayList<Timer> getTimers () {
         return (ArrayList<Timer>) DB.timerDao().getAll();
     }
 }

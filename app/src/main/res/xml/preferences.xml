@@ -12,17 +12,4 @@
            android:summary="Blink LED"
            android:title="Blink LED on alarm" />
    </PreferenceCategory>
-    <PreferenceCategory android:title="Timers">
-        <Preference android:title="Delete all"
-            android:key="delete_all_timers"
-            android:summary="Delete all timers"/>
-    </PreferenceCategory>
-   <PreferenceCategory android:title="Data">
-       <Preference android:title="Import"
-           android:key="import_timers"
-           android:summary="Import timers file"/>
-       <Preference android:title="Export"
-           android:key="export_timers"
-           android:summary="Export timers file"/>
-    </PreferenceCategory>
 </PreferenceScreen>

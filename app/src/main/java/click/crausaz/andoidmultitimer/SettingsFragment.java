@@ -2,13 +2,9 @@ package click.crausaz.andoidmultitimer;
 
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v7.preference.PreferenceFragmentCompat;
 
-/**
- * A simple {@link Fragment} subclass.
- */
-public class SettingsFragment extends PreferenceFragmentCompat {
+public class SettingsFragment extends PreferenceFragmentCompat  {
 
 
     public SettingsFragment() {
@@ -19,5 +15,4 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.preferences, rootKey);
     }
-
 }
