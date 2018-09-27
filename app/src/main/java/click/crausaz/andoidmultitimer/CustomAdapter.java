@@ -38,6 +38,14 @@ public class CustomAdapter extends ArrayAdapter<Timer> {
         TextView full_time = listItem.findViewById(R.id.full_time);
         full_time.setText(current_timer.timer_full_time);
 
+        TextView drawable_left_name = listItem.findViewById(R.id.name);
+
+        if (current_timer.timer_is_running) {
+            drawable_left_name.setCompoundDrawablesWithIntrinsicBounds(R.drawable.baseline_pause_black_18dp, 0, 0, 0);
+        } else {
+            drawable_left_name.setCompoundDrawablesWithIntrinsicBounds(R.drawable.baseline_play_arrow_black_18dp, 0, 0, 0);
+        }
+
         return listItem;
     }
 }

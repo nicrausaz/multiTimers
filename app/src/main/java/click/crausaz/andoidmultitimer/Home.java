@@ -2,10 +2,13 @@ package click.crausaz.andoidmultitimer;
 
 import android.arch.persistence.room.Room;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -18,6 +21,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
@@ -40,6 +44,7 @@ public class Home extends AppCompatActivity {
 
         loadTimersData();
         initListViewListeners(listView);
+        initBackgroundRunning();
     }
 
     @Override
@@ -106,10 +111,8 @@ public class Home extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 // Get the selected item text from ListView
-                String selectedItem = parent.getItemAtPosition(position).toString();
-
-                // Display the selected item text on TextView
-                Log.i("selected:", selectedItem);
+                Timer selected_timer = (Timer) parent.getItemAtPosition(position);
+                triggerTimer(selected_timer);
             }
         });
 
@@ -119,7 +122,7 @@ public class Home extends AppCompatActivity {
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo){
         if (v.getId() == R.id.timers_list){
-            AdapterView.AdapterContextMenuInfo info =(AdapterView.AdapterContextMenuInfo)menuInfo;
+            // AdapterView.AdapterContextMenuInfo info =(AdapterView.AdapterContextMenuInfo)menuInfo;
             menu.add(0,0,0,"Reset");
             menu.add(0,1,1,"Edit");
             menu.add(0,2,2,"Delete");
@@ -150,13 +153,27 @@ public class Home extends AppCompatActivity {
         return super.onContextItemSelected(item);
     }
 
-    public void triggerTimer (View view) {
-        Log.i("click", "clickefoasdbopfbsioudfg");
+    private void triggerTimer (Timer selected_timer) {
+        TextView textView = (TextView) findViewById(R.id.name);
+        // check if timer is counting
+        if (selected_timer.timer_is_running) {
+            textView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.baseline_pause_black_18dp, 0, 0, 0);
+            selected_timer.timer_is_running = false;
+        } else {
+            textView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.baseline_play_arrow_black_18dp, 0, 0, 0);
+            selected_timer.timer_is_running = true;
+        }
+
+        AppDatabase db = Room.databaseBuilder(getApplicationContext(),
+                AppDatabase.class, "timers").allowMainThreadQueries().build();
+        db.timerDao().update(selected_timer);
+        loadTimersData();
+        // maybe must reload listview
     }
 
     private void writeNewTimer(String name, String time) {
         AppDatabase db = Room.databaseBuilder(getApplicationContext(),
-                AppDatabase.class, "timers").allowMainThreadQueries().build(); // replace allowMainThread by async methods ?!
+                AppDatabase.class, "timers").allowMainThreadQueries().build(); // replace allowMainThreadQueries by async methods ?!
         Timer new_timer = new Timer();
         new_timer.timer_name = name;
         new_timer.timer_full_time = time;
@@ -176,5 +193,13 @@ public class Home extends AppCompatActivity {
         AppDatabase db = Room.databaseBuilder(getApplicationContext(),
                 AppDatabase.class, "timers").allowMainThreadQueries().build();
         return (ArrayList<Timer>) db.timerDao().getAll();
+    }
+
+    private void initBackgroundRunning() {
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(this, "14768545")
+                        .setSmallIcon(R.drawable.ic_launcher_background)
+                        .setContentTitle(getApplication().getPackageName() + "is running");
+        mBuilder.build();
     }
 }

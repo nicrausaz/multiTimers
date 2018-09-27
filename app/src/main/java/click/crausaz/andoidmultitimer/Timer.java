@@ -14,4 +14,6 @@ public class Timer{
     public String timer_full_time;
     @ColumnInfo(name = "timer_actual_time")
     public String timer_actual_time;
+    @ColumnInfo(name = "timer_is_running")
+    public boolean timer_is_running;
 }
