@@ -40,8 +40,8 @@
             android:layout_margin="@dimen/input_margin"
             android:ems="10"
             android:hint="@string/add_timer_time"
-            android:inputType="time"
-            android:autofillHints="" />
+            android:inputType="text"
+            android:text="00:01:30" />
 
         <Button
             android:id="@+id/add_button"

@@ -14,14 +14,13 @@ public class TimerService extends Service {
     private Looper mServiceLooper;
     private ServiceHandler mServiceHandler;
 
-    // Handler that receives messages from the thread
     private final class ServiceHandler extends Handler {
         public ServiceHandler(Looper looper) {
             super(looper);
         }
         @Override
         public void handleMessage(Message msg) {
-            // Timer process here !
+            // Timer logic here !
 
                 // once timer is done, kill process, reset icon and time (update db)
             // stopSelf(msg.arg1);

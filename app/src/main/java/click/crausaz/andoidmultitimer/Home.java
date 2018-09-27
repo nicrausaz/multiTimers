@@ -1,13 +1,11 @@
 package click.crausaz.andoidmultitimer;
 
-import android.animation.ValueAnimator;
 import android.arch.persistence.room.Room;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -22,45 +20,42 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 public class Home extends AppCompatActivity {
 
     private CustomAdapter timers_adapter;
     private ArrayList<Timer> timers_list;
     private ListView listView;
-    private TimerService timer_service;
+    private AppDatabase DB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         Toolbar toolbar = findViewById(R.id.toolbar);
-        listView = findViewById(R.id.timers_list);
         setSupportActionBar(toolbar);
-        initAddButton();
+        DB = Room.databaseBuilder(getApplicationContext(),
+                AppDatabase.class, "timers").allowMainThreadQueries().build();
 
+        listView = findViewById(R.id.timers_list);
+        initAddButton();
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
         loadTimersData();
         initListViewListeners(listView);
-        initBackgroundRunning();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_home, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             startActivity(new Intent(this, SettingsActivity.class));
             return true;
@@ -84,6 +79,7 @@ public class Home extends AppCompatActivity {
     private void initAddTimerDialog () {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View mView = getLayoutInflater().inflate(R.layout.add_timer_dialog,null);
+
         final EditText new_name = mView.findViewById(R.id.new_timer_name);
         final EditText new_time = mView.findViewById(R.id.new_timer_time);
         Button mLogin = mView.findViewById(R.id.add_button);
@@ -94,12 +90,13 @@ public class Home extends AppCompatActivity {
         mLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(!new_name.getText().toString().isEmpty() && !new_time.getText().toString().isEmpty()){
+                String returned_message = validateAddTimerInputs(new_name.getText().toString(), new_time.getText().toString());
+                if (returned_message == "success") {
                     writeNewTimer(new_name.getText().toString(), new_time.getText().toString());
                     dialog.dismiss();
                 } else {
-                    Snackbar.make(view, "Please fill values", Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
+                    Snackbar.make(view, returned_message, Snackbar.LENGTH_LONG)
+                           .setAction("Action", null).show();
                 }
             }
         });
@@ -135,17 +132,17 @@ public class Home extends AppCompatActivity {
 
         switch (item.getItemId()) {
             case 0:
-                // reset timer
+                Timer to_reset = timers_list.get(selectpos);
+                to_reset.timer_actual_time = to_reset.timer_full_time;
+                DB.timerDao().delete(to_reset);
                 break;
             case 1:
                 // edit timer
                 break;
             case 2:
                 // delete timer
-                AppDatabase db = Room.databaseBuilder(getApplicationContext(),
-                        AppDatabase.class, "timers").allowMainThreadQueries().build();
                 Timer to_delete = timers_list.get(selectpos);
-                db.timerDao().delete(to_delete);
+                DB.timerDao().delete(to_delete);
                 break;
         }
         loadTimersData();
@@ -156,7 +153,7 @@ public class Home extends AppCompatActivity {
         TextView textView = findViewById(R.id.name);
         // check if timer is counting
         if (selected_timer.timer_is_running) {
-            // pause timer
+            // stop timer
             textView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.baseline_pause_black_18dp, 0, 0, 0);
             selected_timer.timer_is_running = false;
             stopService(new Intent(this, TimerService.class));
@@ -174,13 +171,11 @@ public class Home extends AppCompatActivity {
     }
 
     private void writeNewTimer(String name, String time) {
-        AppDatabase db = Room.databaseBuilder(getApplicationContext(),
-                AppDatabase.class, "timers").allowMainThreadQueries().build(); // replace allowMainThreadQueries by async methods ?!
         Timer new_timer = new Timer();
         new_timer.timer_name = name;
         new_timer.timer_full_time = time;
         new_timer.timer_actual_time = time;
-        db.timerDao().insertAll(new_timer);
+        DB.timerDao().insertAll(new_timer);
         loadTimersData();
     }
 
@@ -191,17 +186,17 @@ public class Home extends AppCompatActivity {
         timers_adapter.notifyDataSetChanged();
     }
 
-    private ArrayList<Timer> getTimers() {
-        AppDatabase db = Room.databaseBuilder(getApplicationContext(),
-                AppDatabase.class, "timers").allowMainThreadQueries().build();
-        return (ArrayList<Timer>) db.timerDao().getAll();
+    private String validateAddTimerInputs (String new_name, String new_time) {
+        if(new_name.isEmpty() || new_time.isEmpty()){
+            return "Please fill inputs";
+        } else if (!Pattern.matches("[0-9][0-9]:[0-9][0-9]:[0-9][0-9]", new_time)) {
+            return "Wrong time format (must be hh:mm:ss)";
+        } else {
+            return "success";
+        }
     }
 
-    private void initBackgroundRunning() {
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(this, "14768545")
-                        .setSmallIcon(R.drawable.ic_launcher_background)
-                        .setContentTitle(getApplication().getPackageName() + "is running");
-        mBuilder.build();
+    private ArrayList<Timer> getTimers() {
+        return (ArrayList<Timer>) DB.timerDao().getAll();
     }
 }
