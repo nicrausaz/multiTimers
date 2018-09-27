@@ -4,6 +4,7 @@ import android.arch.persistence.room.Room;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
@@ -72,17 +73,23 @@ public class Home extends AppCompatActivity {
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) { initAddTimerDialog(); }
+            public void onClick(View view) { initAddOrEditTimerDialog("add", null); }
         });
     }
 
-    private void initAddTimerDialog () {
+    private void initAddOrEditTimerDialog (String use_case, @Nullable Timer editing_timer) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View mView = getLayoutInflater().inflate(R.layout.add_timer_dialog,null);
-
         final EditText new_name = mView.findViewById(R.id.new_timer_name);
         final EditText new_time = mView.findViewById(R.id.new_timer_time);
+        final String usage_case = use_case;
+        final Timer edited_timer = editing_timer;
         Button mLogin = mView.findViewById(R.id.add_button);
+
+         if (usage_case == "edit") {
+            new_name.setText(editing_timer.timer_name);
+            new_time.setText(editing_timer.timer_full_time);
+        }
 
         builder.setView(mView);
         final AlertDialog dialog = builder.create();
@@ -92,8 +99,16 @@ public class Home extends AppCompatActivity {
             public void onClick(View view) {
                 String returned_message = validateAddTimerInputs(new_name.getText().toString(), new_time.getText().toString());
                 if (returned_message == "success") {
-                    writeNewTimer(new_name.getText().toString(), new_time.getText().toString());
+                    if (usage_case == "edit") {
+                        edited_timer.timer_name = new_name.getText().toString();
+                        edited_timer.timer_full_time = new_time.getText().toString();
+                        edited_timer.timer_actual_time = edited_timer.timer_full_time;
+                        DB.timerDao().update(edited_timer);
+                    } else if (usage_case == "add") {
+                        writeNewTimer(new_name.getText().toString(), new_time.getText().toString());
+                    }
                     dialog.dismiss();
+                    loadTimersData();
                 } else {
                     Snackbar.make(view, returned_message, Snackbar.LENGTH_LONG)
                            .setAction("Action", null).show();
@@ -132,12 +147,15 @@ public class Home extends AppCompatActivity {
 
         switch (item.getItemId()) {
             case 0:
+                // reset timer
                 Timer to_reset = timers_list.get(selectpos);
                 to_reset.timer_actual_time = to_reset.timer_full_time;
                 DB.timerDao().delete(to_reset);
                 break;
             case 1:
                 // edit timer
+                Timer to_edit = timers_list.get(selectpos);
+                initAddOrEditTimerDialog("edit", to_edit);
                 break;
             case 2:
                 // delete timer
@@ -176,7 +194,6 @@ public class Home extends AppCompatActivity {
         new_timer.timer_full_time = time;
         new_timer.timer_actual_time = time;
         DB.timerDao().insertAll(new_timer);
-        loadTimersData();
     }
 
     private void loadTimersData () {
