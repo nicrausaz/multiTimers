@@ -27,6 +27,8 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".Home" />
         </activity>
+        <service android:name=".TimerService" >
+        </service>
     </application>
 
 </manifest>

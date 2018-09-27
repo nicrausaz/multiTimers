@@ -1,18 +1,16 @@
 package click.crausaz.andoidmultitimer;
 
+import android.animation.ValueAnimator;
 import android.arch.persistence.room.Room;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -30,6 +28,7 @@ public class Home extends AppCompatActivity {
     private CustomAdapter timers_adapter;
     private ArrayList<Timer> timers_list;
     private ListView listView;
+    private TimerService timer_service;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -154,21 +153,24 @@ public class Home extends AppCompatActivity {
     }
 
     private void triggerTimer (Timer selected_timer) {
-        TextView textView = (TextView) findViewById(R.id.name);
+        TextView textView = findViewById(R.id.name);
         // check if timer is counting
         if (selected_timer.timer_is_running) {
+            // pause timer
             textView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.baseline_pause_black_18dp, 0, 0, 0);
             selected_timer.timer_is_running = false;
+            stopService(new Intent(this, TimerService.class));
         } else {
             textView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.baseline_play_arrow_black_18dp, 0, 0, 0);
+            // start time
             selected_timer.timer_is_running = true;
+            startService(new Intent(this, TimerService.class));
         }
 
         AppDatabase db = Room.databaseBuilder(getApplicationContext(),
                 AppDatabase.class, "timers").allowMainThreadQueries().build();
         db.timerDao().update(selected_timer);
         loadTimersData();
-        // maybe must reload listview
     }
 
     private void writeNewTimer(String name, String time) {

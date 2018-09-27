@@ -9,10 +9,10 @@
         android:id="@+id/name"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:drawableLeft="@drawable/baseline_play_arrow_black_18dp"
+        android:layout_weight="0.3"
+        android:drawableStart="@drawable/baseline_play_arrow_black_18dp"
         android:drawablePadding="32dp"
         android:gravity="left|center_vertical"
-        android:layout_weight="0.3"
         android:textColor="@color/colorAccent" />
     <TextView
         android:id="@+id/actual_time"
