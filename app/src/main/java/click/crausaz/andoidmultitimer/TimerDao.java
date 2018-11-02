@@ -16,6 +16,9 @@ public interface TimerDao {
     @Insert
     void insertAll(Timer... timers);
 
+    @Query("UPDATE Timer SET timer_is_running = 0, timer_actual_time = timer_full_time")
+    void resetAll();
+
     @Update
     void update(Timer... timers);
 
